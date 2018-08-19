@@ -45,25 +45,6 @@ def get_summary_from_result(div):
     return extract_text(div.find('span', {'class' : 'summary'}))
 
 
-def get_salary_from_result(div):
-
-    if div.find('nobr'):
-        return div.find('nobr').text
-
-    elif div.find('span', {'class' : 'no-wrap'}):
-        return div.find('span', {'class' : 'no-wrap'}).text
-
-    elif div.find(name='div', attrs={'class':'sjcl'}):
-
-        div_2 = div.find(name='div', attrs={'class':'sjcl'})
-        if div_2.find('div'):
-            return div_2.find('div').text
-
-    else:
-        return None
-
-
-
 
 
 def extract_posts_to_df(keyword=[], city_set=[], max_results_per_city=int):
