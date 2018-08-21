@@ -40,25 +40,6 @@ def extract_text(query):
         return None
 
 
-def get_title_from_result(div):
-    return extract_text(div.find(name='a', attrs={'data-tn-element':'jobTitle'}))
-
-
-def get_company_from_result(div):
-    return extract_text(div.find('span', {'class' : 'company'}))
-
-
-def get_location_from_result(div):
-    return extract_text(div.find('span', {'class' : 'location'}))
-
-
-def get_summary_from_result(div):
-    return extract_text(div.find('span', {'class' : 'summary'}))
-
-
-
-
-
 def extract_indeed_posts_to_df(keyword=[], city_set=[], max_results_per_city=int):
 
 
@@ -74,10 +55,10 @@ def extract_indeed_posts_to_df(keyword=[], city_set=[], max_results_per_city=int
 
             for div in soup.find_all(name='div', attrs={'class':'row'}):
                 job_post['city'].append(city)
-                job_post['title'].append(get_title_from_result(div))
-                job_post['company'].append(get_company_from_result(div))
-                job_post['location'].append(get_location_from_result(div))
-                job_post['summary'].append(get_summary_from_result(div))
+                job_post['title'].append(extract_text(div.find(name='a', attrs={'data-tn-element':'jobTitle'})))
+                job_post['company'].append(extract_text(div.find('span', {'class' : 'company'})))
+                job_post['location'].append(extract_text(div.find('span', {'class' : 'location'})))
+                job_post['summary'].append(extract_text(div.find('span', {'class' : 'summary'})))
 
     df = pd.DataFrame.from_records(job_post)
     df.drop_duplicates(inplace=True)
@@ -125,11 +106,11 @@ def extract_indeed_posts_to_csv(keyword=[], city_set=[], max_results_per_city=in
             soup = BeautifulSoup(page.text, 'html.parser')
 
             for div in soup.find_all(name='div', attrs={'class':'row'}):
-                f.write(str(city)+',')
-                f.write('\"'+str(get_title_from_result(div))+'\"'+',')
-                f.write('\"'+str(get_company_from_result(div))+'\"'+',')
-                f.write('\"'+str(get_location_from_result(div))+'\"'+',')
-                f.write('\"'+str(get_summary_from_result(div))+'\"'+'\n')
+                file.write(str(city)+',')
+                file.write('\"'+str(extract_text(div.find(name='a', attrs={'data-tn-element':'jobTitle'})))+'\"'+',')
+                file.write('\"'+str(extract_text(div.find('span', {'class' : 'company'})))+'\"'+',')
+                file.write('\"'+str(extract_text(div.find('span', {'class' : 'location'})))+'\"'+',')
+                file.write('\"'+str(extract_text(div.find('span', {'class' : 'summary'})))+'\"'+'\n')
     return 0
 
 def extract_ziprecruiter_posts_to_csv(keyword=[], city_set=[], max_results_per_city=int, file = 0):
@@ -146,11 +127,11 @@ def extract_ziprecruiter_posts_to_csv(keyword=[], city_set=[], max_results_per_c
             soup = BeautifulSoup(page.text, 'html.parser')
 
             for div in soup.find_all(name='div', class_='job_content'):
-                f.write(str(city)+",")
-                f.write('\"'+ str(extract_text(div.find('span',class_='just_job_title')))+'\"'+",")
-                f.write('\"'+str(extract_text(div.find('a',class_='t_org_link name')))+'\"'+",")
-                f.write('\"'+str(extract_text(div.find('a',class_='t_location_link location')))+'\"'+",")
-                f.write('\"'+str(extract_text(div.find('p',class_='job_snippet')))+'\"'+'\n')
+                file.write(str(city)+",")
+                file.write('\"'+ str(extract_text(div.find('span',class_='just_job_title')))+'\"'+",")
+                file.write('\"'+str(extract_text(div.find('a',class_='t_org_link name')))+'\"'+",")
+                file.write('\"'+str(extract_text(div.find('a',class_='t_location_link location')))+'\"'+",")
+                file.write('\"'+str(extract_text(div.find('p',class_='job_snippet')))+'\"'+'\n')
 
     df = pd.DataFrame.from_records(job_post)
     df.drop_duplicates(inplace=True)
@@ -159,9 +140,7 @@ def extract_ziprecruiter_posts_to_csv(keyword=[], city_set=[], max_results_per_c
     return df
 
 
-cities = ['los angeles','chicago','san francisco','seattle','new york','austin',
-          'philadelphia','atlanta','dallas','portland','phoenix','denver',
-          'houston','miami','washington']
+cities = ['los angeles','chicago','san francisco','seattle','new york']
 f = open('indeed_posts.csv','w')
 extract_indeed_posts_to_csv(keyword=['data scientist'],city_set = cities, max_results_per_city = 1000, file = f)
 f.close()
